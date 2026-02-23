@@ -45,85 +45,84 @@ dex:
       type: memory
     web:
       http: 0.0.0.0:5556
-      allowedOrigins: ['*']
+      allowedOrigins: ["*"]
     oauth2:
       responseTypes: ["code", "token", "id_token"]
       skipApprovalScreen: true
 
     connectors:
-    - type: ldap
-      name: OpenLDAP
-      id: ldap
-      config:
-        # The following configurations seem to work with OpenLDAP:
-        #
-        # 1) Plain LDAP, without TLS:
-        host: terrakube-openldap-service:1389
-        insecureNoSSL: true
-        #
-        # 2) LDAPS without certificate validation:
-        #host: localhost:636
-        #insecureNoSSL: false
-        #insecureSkipVerify: true
-        #
-        # 3) LDAPS with certificate validation:
-        #host: YOUR-HOSTNAME:636
-        #insecureNoSSL: false
-        #insecureSkipVerify: false
-        #rootCAData: 'CERT'
-        # ...where CERT="$( base64 -w 0 your-cert.crt )"
+      - type: ldap
+        name: OpenLDAP
+        id: ldap
+        config:
+          # The following configurations seem to work with OpenLDAP:
+          #
+          # 1) Plain LDAP, without TLS:
+          host: terrakube-openldap-service:1389
+          insecureNoSSL: true
+          #
+          # 2) LDAPS without certificate validation:
+          #host: localhost:636
+          #insecureNoSSL: false
+          #insecureSkipVerify: true
+          #
+          # 3) LDAPS with certificate validation:
+          #host: YOUR-HOSTNAME:636
+          #insecureNoSSL: false
+          #insecureSkipVerify: false
+          #rootCAData: 'CERT'
+          # ...where CERT="$( base64 -w 0 your-cert.crt )"
 
-        # This would normally be a read-only user.
-        bindDN: cn=admin,dc=example,dc=org
-        bindPW: admin
+          # This would normally be a read-only user.
+          bindDN: cn=admin,dc=example,dc=org
+          bindPW: admin
 
-        usernamePrompt: Email Address
+          usernamePrompt: Email Address
 
-        userSearch:
-          baseDN: ou=users,dc=example,dc=org
-          filter: "(objectClass=person)"
-          username: mail
-          # "DN" (case sensitive) is a special attribute name. It indicates that
-          # this value should be taken from the entity's DN not an attribute on
-          # the entity.
-          idAttr: DN
-          emailAttr: mail
-          nameAttr: cn
+          userSearch:
+            baseDN: ou=users,dc=example,dc=org
+            filter: "(objectClass=person)"
+            username: mail
+            # "DN" (case sensitive) is a special attribute name. It indicates that
+            # this value should be taken from the entity's DN not an attribute on
+            # the entity.
+            idAttr: DN
+            emailAttr: mail
+            nameAttr: cn
 
-        groupSearch:
-          baseDN: ou=Groups,dc=example,dc=org
-          filter: "(objectClass=groupOfNames)"
+          groupSearch:
+            baseDN: ou=Groups,dc=example,dc=org
+            filter: "(objectClass=groupOfNames)"
 
-          userMatchers:
-            # A user is a member of a group when their DN matches
-            # the value of a "member" attribute on the group entity.
-          - userAttr: DN
-            groupAttr: member
+            userMatchers:
+              # A user is a member of a group when their DN matches
+              # the value of a "member" attribute on the group entity.
+              - userAttr: DN
+                groupAttr: member
 
-          # The group name should be the "cn" value.
-          nameAttr: cn
+            # The group name should be the "cn" value.
+            nameAttr: cn
 
     staticClients:
-    - id: example-app
-      redirectURIs:
-      - 'http://terrakube-ui.minikube.net'
-      - '/device/callback'
-      - 'http://localhost:10000/login'
-      - 'http://localhost:10001/login'
-      name: 'example-app'
-      public: true
+      - id: example-app
+        redirectURIs:
+          - "http://terrakube-ui.minikube.net"
+          - "/device/callback"
+          - "http://localhost:10000/login"
+          - "http://localhost:10001/login"
+        name: "example-app"
+        public: true
   volumes:
-  - name: gcp-credentials
-    secret:
-      secretName: terrakube-dex-secrets
-      items:
-      - key: "gcp-credentials"
-        path: "gcp-credentials"
+    - name: gcp-credentials
+      secret:
+        secretName: terrakube-dex-secrets
+        items:
+          - key: "gcp-credentials"
+            path: "gcp-credentials"
   volumeMount:
-  - name: gcp-credentials
-    mountPath: /etc/gcp/secret
-    readOnly: true
-
+    - name: gcp-credentials
+      mountPath: /etc/gcp/secret
+      readOnly: true
 
 ## Terraform Storage
 storage:
@@ -137,6 +136,7 @@ storage:
     secretKey: ""
     bucketName: ""
     region: ""
+    enableRoleAuth: false
   minio:
     accessKey: ""
     secretKey: ""
@@ -149,7 +149,6 @@ storage:
   default:
     region: "us-east-1"
     endpoint: ""
-
 
 # Default Storage Minio Configuration
 minio:
@@ -212,7 +211,7 @@ api:
     traces:
       type: jaeger
       # endpoint its just example, change it to your jaeger endpoint
-      endpoint: "http://terrakube-api.minikube.net:9411/api/v2/spans" 
+      endpoint: "http://terrakube-api.minikube.net:9411/api/v2/spans"
   rbac:
     create: false
     roleName: "terrakube-api-role"
@@ -221,7 +220,7 @@ api:
     enabled: false
     secretName: terrakube-executor-secrets
   secrets:
-   - terrakube-api-secrets
+    - terrakube-api-secrets
   resources: {}
   podLabels: {}
   podAnnotations: {}
@@ -261,9 +260,9 @@ api:
     redisPassword: ""
     redisPort: "6379"
     executorUrl: "http://terrakube-executor-service:8090"
-    
+
 ## DONT FORGET TO UPDATE THE PORT DEPENDING OF THE DATABASE BY DEFAULT IS USING THE POSTGRESQL PORT
-## SslMode values are disable, allow, prefer, require, verify-ca, verify-full. Default mode is "disable".   
+## SslMode values are disable, allow, prefer, require, verify-ca, verify-full. Default mode is "disable".
 ## Reference: https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/PGProperty.html#SSL_MODE
 
 ## Executor properties
@@ -277,7 +276,7 @@ executor:
   serviceAccountName: ""
   revisionHistoryLimit: 3
   secrets:
-   - terrakube-executor-secrets
+    - terrakube-executor-secrets
   otel:
     enabled: false
     metrics:
@@ -286,7 +285,7 @@ executor:
     traces:
       type: jaeger
       # endpoint its just example, change it to your jaeger endpoint
-      endpoint: "http://terrakube-api.minikube.net:9411/api/v2/spans" 
+      endpoint: "http://terrakube-api.minikube.net:9411/api/v2/spans"
   resources: {}
   podLabels: {}
   podAnnotations: {}
@@ -318,7 +317,7 @@ registry:
   serviceAnnotations: {}
   revisionHistoryLimit: 3
   secrets:
-   - terrakube-registry-secrets
+    - terrakube-registry-secrets
   otel:
     enabled: false
     metrics:
@@ -327,7 +326,7 @@ registry:
     traces:
       type: jaeger
       # endpoint its just example, change it to your jaeger endpoint
-      endpoint: "http://terrakube-api.minikube.net:9411/api/v2/spans" 
+      endpoint: "http://terrakube-api.minikube.net:9411/api/v2/spans"
   resources: {}
   podAnnotations: {}
   podLabels: {}
@@ -366,7 +365,7 @@ ui:
 ingress:
   useTls: false
   includeTlsHosts: true
-  controller: "generic"  # Options: "generic", "aws", "gke, gatewayapi"
+  controller: "generic" # Options: "generic", "aws", "gke, gatewayapi"
 
   gatewayapi:
     apiVersion: v1beta1
@@ -384,7 +383,7 @@ ingress:
     tlsSecretName: tls-secret-ui-terrakube
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"
-  
+
   api:
     enabled: true
     domain: "terrakube-api.minikube.net"
@@ -421,10 +420,10 @@ ingress:
     path: "/"
     pathType: "Prefix"
     ingressClassName: "nginx"
-    tlsSecretName: tls-secret-executor-terrakube    
+    tlsSecretName: tls-secret-executor-terrakube
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"
-  
+
   # AWS specific configuration
   aws:
     enabled: false
@@ -434,7 +433,7 @@ ingress:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
-      alb.ingress.kubernetes.io/ssl-redirect: '443'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
     certificateArn: ""
     targetGroupBinding:
       create: false
@@ -453,7 +452,7 @@ ingress:
     annotations:
       kubernetes.io/ingress.class: gce
     # Per-service static IP names for individual load balancers
-    uiStaticIPName: ""         
+    uiStaticIPName: ""
     apiStaticIPName: ""
     registryStaticIPName: ""
     executorStaticIPName: ""
@@ -463,15 +462,15 @@ ingress:
       create: false
       timeout: 30
       # Per-service security policies (optional)
-      uiSecurityPolicy: ""        # Cloud Armor policy for UI (user access restriction)
-      apiSecurityPolicy: ""       # Cloud Armor policy for API (usually empty - external access needed)
-      registrySecurityPolicy: ""  # Cloud Armor policy for Registry (usually empty - external access needed)
-      executorSecurityPolicy: ""  # Cloud Armor policy for Executor (usually empty if exposed)
+      uiSecurityPolicy: "" # Cloud Armor policy for UI (user access restriction)
+      apiSecurityPolicy: "" # Cloud Armor policy for API (usually empty - external access needed)
+      registrySecurityPolicy: "" # Cloud Armor policy for Registry (usually empty - external access needed)
+      executorSecurityPolicy: "" # Cloud Armor policy for Executor (usually empty if exposed)
     frontendConfig:
       create: false
       redirectToHttps: true
     externalDNS:
-      perIngressProxy:         # Control whether ExternalDNS creates proxy records (Cloudflare)
+      perIngressProxy: # Control whether ExternalDNS creates proxy records (Cloudflare)
         ui: false
         api: false
         registry: false
